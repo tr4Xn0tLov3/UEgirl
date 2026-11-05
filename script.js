@@ -64,6 +64,7 @@ html,body{background:#060807!important;color:#e8efe9}
 .l2{background:var(--xp)}.l1{background:#1d6b43}.l0{background:#2a2f2c}
 .shl{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:#6d7d72}
 .shl b{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.pzn{padding:12px 14px;border:1px solid var(--xl);border-radius:6px;color:#93a398;font-size:14px}
 .xs{display:flex;gap:6px}
 .xs span{flex:1;text-align:center;font-size:11px;padding:8px 2px;border-radius:4px;background:#0b0f0d;border:1px solid var(--xl);color:#5d6d62}
 .xs span.on{background:var(--xp);border-color:var(--xp);color:#04120a;font-weight:700}
@@ -95,6 +96,7 @@ const st=document.createElement('style');st.textContent=CSS;document.head.append
 const G=['Valorant','CS2','Dota 2','Apex','Fortnite','Genshin','Minecraft','LoL'];
 const DN=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 const SL=['Сегодня отдыхает','Сегодня по договорённости','Сегодня свободна'];
+const VB=['Чилл','На победу','Учу и объясняю'];
 const TD=()=>(new Date().getDay()+6)%7;
 const NM='Sakura Mira Kira Luna Nika Vega Alice Yuki Reina Stella Mika Lola Ayla Zoya Dana Tilda Kami Nori Pixie Fox Raya Sia Emi Lana Neva Ilsa Vika Rin Sora Tori Zara Mavi Kesha Lumi Indi Cleo Bela Nyx Elfi Hana Juno Mono Opal Pearl'.split(' ');
 const BIO=['Играю с детства, объясняю без токсичности','Люблю шутки в голосе и тактические катки','Помогу подняться по рангу и не потерять настроение','Чилл-катки по вечерам, без нервов','Хожу на турниры, возьму в команду','Спокойный саппорт, громкий смех'];
@@ -113,27 +115,30 @@ const EV=[
 let s=89;const rn=()=>(s=(s*1664525+1013904223)%4294967296)/4294967296;
 const P=NM.map((n,i)=>{const g=[G[i%8]];if(rn()>.4)g.push(G[(i+3)%8]);if(rn()>.7)g.push(G[(i+5)%8]);
 const o={id:i+1,n,a:18+Math.floor(rn()*10),g,pr:Math.round((300+rn()*900)/50)*50,r:+(4.5+rn()*.5).toFixed(1),rv:12+Math.floor(rn()*400),on:rn()>.45,v:rn()>.35,h:Math.floor(rn()*1000),bio:BIO[i%6],w:100+Math.floor(rn()*900)};
-o.d=Array.from({length:7},()=>{const x=rn();return x>.72?0:x>.38?1:2});return o});
+o.d=Array.from({length:7},()=>{const x=rn();return x>.72?0:x>.38?1:2});
+o.vb=Math.floor(rn()*3);return o});
 
 /* STATE */
 let bal=ld('sq_bal',3000),fav=ld('sq_fav',[]),ord=ld('sq_ord',[]),evj=ld('sq_ev',[]),my=ld('sq_my',null);
 const allP=()=>my?[my,...P]:P;
 const gp=id=>allP().find(p=>String(p.id)===String(id));
-let F={q:'',g:'',s:'r',on:false,v:false,fr:false,n:12},T='w',B={f:'Дуо',h:1,c:''},BP=null,OID=null,otm=null,cur=null,au=null;
-let W={s:0,n:'',a:'',g:[],pr:'',bio:'',ph:[],ok:false,d:[2,2,2,2,2,1,1]};
+let F={q:'',g:'',s:'r',vb:'',on:false,v:false,fr:false,n:12},T='w',B={f:'Дуо',h:1,c:''},BP=null,OID=null,otm=null,cur=null,au=null;
+let W={s:0,n:'',a:'',g:[],pr:'',bio:'',ph:[],ok:false,vb:0,d:[2,2,2,2,2,1,1]};
 
 /* HELPERS */
 const av=(p,k)=>{const u=p.ph&&p.ph[k];const src=u||`https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(p.n+'-'+k)}&backgroundColor=ffd5dc,d1d4f9,c0aede,b6e3f4`;return `<img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'">`};
-const card=p=>`<a class="xc" href="#/p/${p.id}"><div class="xa">${av(p,0)}${p.on?'<i class="xo"></i>':''}${p.v?'<b class="xv">🎙</b>':''}</div><h4>${p.n}, ${p.a}</h4><p>${p.g[0]} · ★${p.r}</p><em>${p.pr} ₽/ч</em></a>`;
+const card=p=>`<a class="xc" href="#/p/${p.id}"><div class="xa">${av(p,0)}${p.on?'<i class="xo"></i>':''}${p.v?'<b class="xv">🎙</b>':''}</div><h4>${p.n}, ${p.a}</h4><p>${p.g[0]} · ${VB[p.vb||0]} · ★${p.r}</p><em>${p.pr} ₽/ч</em></a>`;
 const grid=a=>a.length?`<div class="xg">${a.map(card).join('')}</div>`:'<p>Никого не нашли. Измени фильтры.</p>';
 const opt=(arr,sel)=>arr.map(([v,l])=>`<option value="${v}" ${v==sel?'selected':''}>${l}</option>`).join('');
 const gopts=[['','Все игры'],...G.map(g=>[g,g])];
+const vopts=[['','Любой настрой'],...VB.map((x,i)=>[String(i),x])];
 const nf=()=>`<h1>404</h1><p>Такой страницы нет.</p><a class="xb" href="#/">На главную</a>`;
 const calc=(p,f,h,c)=>{const base=Math.round(p.pr*FM[f]*h),d=PRM[(c||'').trim().toUpperCase()]||0,disc=Math.round(base*d),fee=Math.round((base-disc)*.1);return{base,disc,fee,total:base-disc+fee}};
 const setBal=()=>{sv('sq_bal',bal);const b=$('#bal');if(b)b.textContent=bal.toLocaleString('ru')+' ₽';const x=$('#xbl');if(x)x.textContent=bal.toLocaleString('ru')+' ₽'};
 let ttm;function tt(m){const t=$('#xt');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(ttm);ttm=setTimeout(()=>t.classList.remove('on'),2600)}
-const lvl=p=>(p.d||[2,2,2,2,2,2,2])[TD()];
-const sched=p=>{const d=p.d||[2,2,2,2,2,2,2],td=TD();return `<div class="sh"><b>${SL[lvl(p)]}</b><br><small>Расписание недели. Она сама решает, когда играть.</small><div class="shb">${d.map((v,i)=>`<div class="shd ${i==td?'td':''}"><i class="l${v}"></i><span>${DN[i]}</span></div>`).join('')}</div><div class="shl"><span><b class="l2"></b>свободна</span><span><b class="l1"></b>по договорённости</span><span><b class="l0"></b>отдых</span></div></div>`};
+const paused=p=>!!(p&&p.pz&&p.pz.includes(TD()));
+const lvl=p=>paused(p)?0:(p.d||[2,2,2,2,2,2,2])[TD()];
+const sched=p=>{const d=p.d||[2,2,2,2,2,2,2],td=TD();return `<div class="sh"><b>${paused(p)?'Сегодня на паузе':SL[lvl(p)]}</b><br><small>Расписание недели. Она сама решает, когда играть.</small><div class="shb">${d.map((v,i)=>`<div class="shd ${i==td?'td':''}"><i class="l${v}"></i><span>${DN[i]}</span></div>`).join('')}</div><div class="shl"><span><b class="l2"></b>свободна</span><span><b class="l1"></b>по договорённости</span><span><b class="l0"></b>отдых</span></div></div>`};
 
 /* VOICE */
 function stopV(){try{speechSynthesis.cancel()}catch(e){}if(au){au.pause();au=null}$$('.vx.on').forEach(x=>x.classList.remove('on'));$$('.vx button').forEach(b=>b.textContent='▶');cur=null}
@@ -164,12 +169,13 @@ R.home=()=>{const on=P.filter(p=>p.on);return `
 <div class="xg">${['Выбери напарницу','Забронируй время','Играйте','Оцени и оплати'].map((t,i)=>`<div class="xk"><h2 style="margin:0;color:var(--xp)">0${i+1}</h2><p>${t}</p></div>`).join('')}</div>
 <p>Промокоды −10%: 89SQUAD, BRATISHKIN, UEGIRL</p>`};
 
-const catL=()=>{const td=TD();let a=allP().filter(p=>(!F.q||p.n.toLowerCase().includes(F.q.toLowerCase()))&&(!F.g||p.g.includes(F.g))&&(!F.on||p.on)&&(!F.v||p.v)&&(!F.fr||(p.d||[2,2,2,2,2,2,2])[td]==2));
+const catL=()=>{const td=TD();let a=allP().filter(p=>!paused(p)&&(!F.q||p.n.toLowerCase().includes(F.q.toLowerCase()))&&(!F.g||p.g.includes(F.g))&&(!F.vb||String(p.vb||0)==F.vb)&&(!F.on||p.on)&&(!F.v||p.v)&&(!F.fr||(p.d||[2,2,2,2,2,2,2])[td]==2));
 a.sort((x,y)=>F.s=='pr'?x.pr-y.pr:F.s=='pd'?y.pr-x.pr:(y.r-x.r)||(y.rv-x.rv));
 return `<p>Найдено: ${a.length}</p>${grid(a.slice(0,F.n))}${a.length>F.n?'<div class="xr"><button class="xb g" data-a="more">Показать ещё</button></div>':''}`};
 R.catalog=()=>`<h1>Каталог</h1><div class="xk">
 <input class="xi" data-f="q" placeholder="Поиск по нику" value="${esc(F.q)}">
 <select class="xi" data-f="g">${opt(gopts,F.g)}</select>
+<select class="xi" data-f="vb">${opt(vopts,F.vb)}</select>
 <select class="xi" data-f="s">${opt([['r','По рейтингу'],['pr','Дешевле'],['pd','Дороже']],F.s)}</select>
 <label><input type="checkbox" data-f="on" ${F.on?'checked':''}> Только онлайн</label><br>
 <label><input type="checkbox" data-f="v" ${F.v?'checked':''}> С голосом</label><br>
@@ -185,31 +191,35 @@ R.match=()=>`<h1>Подбор</h1><p>Быстро одним нажатием и
 <input class="xi" id="pa" type="number" placeholder="Возраст до">
 <input class="xi" id="pp" type="number" placeholder="Цена до, ₽/ч">
 <select class="xi" id="pg">${opt(gopts,'')}</select>
+<select class="xi" id="pb">${opt(vopts,'')}</select>
 <label><input type="checkbox" id="po"> Онлайн</label><br><label><input type="checkbox" id="pv"> С голосом</label><br>
 <div class="xr"><button class="xb" data-a="mfind">Показать</button></div></div>
 <div id="mres"></div>`;
 
 const sc=(p,k)=>p.r*10+((p.h*k)%40)/4+p.rv/60;
 const tabs=()=>[['w','Неделя'],['m','Месяц'],['a','Всё время']].map(([k,l])=>`<button class="xch ${T==k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('');
-const topB=()=>{const k={w:1,m:2,a:3}[T];const a=allP().slice().sort((x,y)=>sc(y,k)-sc(x,k)).slice(0,15);const m=['2','1','3'];
+const topB=()=>{const k={w:1,m:2,a:3}[T];const a=allP().filter(p=>!paused(p)).sort((x,y)=>sc(y,k)-sc(x,k)).slice(0,15);const m=['2','1','3'];
 return `<div class="xpd">${[a[1],a[0],a[2]].map((p,i)=>`<a class="xc" href="#/p/${p.id}"><div class="xa">${av(p,0)}</div><h4>${m[i]}. ${p.n}</h4><p>★${p.r}</p></a>`).join('')}</div>
 <div style="margin-top:16px">${a.slice(3).map((p,i)=>`<a class="xrw" href="#/p/${p.id}"><b style="width:26px;color:var(--xp)">${i+4}</b><div class="xa">${av(p,0)}</div><div><b>${p.n}</b><br><small>${p.g[0]} · ${p.pr} ₽/ч</small></div><span style="margin-left:auto">★${p.r}</span></a>`).join('')}</div>`};
 R.top=()=>`<h1>Топ</h1><div id="tt">${tabs()}</div><div id="tp" style="margin-top:16px">${topB()}</div>`;
 
 R.p=id=>{const p=gp(id);if(!p)return nf();const fv=fav.includes(String(p.id));
-const sim=allP().filter(x=>String(x.id)!==String(p.id)&&x.g[0]==p.g[0]).concat(P).filter((x,i,r)=>String(x.id)!==String(p.id)&&r.indexOf(x)==i).slice(0,4);
+const sim=allP().filter(x=>String(x.id)!==String(p.id)&&!paused(x)&&x.g[0]==p.g[0]).concat(P).filter((x,i,r)=>String(x.id)!==String(p.id)&&r.indexOf(x)==i).slice(0,4);
 const rv=p.rv?[0,1,2].map(i=>`<div class="xk"><b>${RN[(p.h+i)%6]}</b> · ★${i==2?4:5}<p>${RT[(p.h+i*2)%5]}</p></div>`).join(''):'<p>Отзывов пока нет.</p>';
 return `<div class="xpf"><div><div class="xa">${av(p,0)}${p.on?'<i class="xo"></i>':''}</div>
 <div class="xg" style="grid-template-columns:1fr 1fr"><div class="xa">${av(p,1)}</div><div class="xa">${av(p,2)}</div></div></div>
 <div><h1>${p.n}, ${p.a}</h1>
-<p>${p.on?'● Онлайн':'○ Не в сети'} · ★${p.r} (${p.rv}) · ${p.w||0} ч в играх</p><p>${p.bio}</p>
+<p>${paused(p)?'⏸ На паузе':p.on?'● Онлайн':'○ Не в сети'} · ★${p.r} (${p.rv}) · ${p.w||0} ч в играх</p>
+<p>Настрой: <b style="color:var(--xp)">${VB[p.vb||0]}</b></p><p>${p.bio}</p>
 ${voice(p)}${sched(p)}<div>${p.g.map(g=>`<span class="xch on">${g}</span>`).join('')}</div>
 <div class="xg" style="grid-template-columns:repeat(3,1fr);margin-top:12px">${Object.entries(FM).map(([f,m])=>`<div class="xk" style="margin:0"><b>${f}</b><br>${Math.round(p.pr*m)} ₽/ч</div>`).join('')}</div>
 <div class="xr"><button class="xb g" data-a="fav" data-v="${p.id}">${fv?'♥ В избранном':'♡ В избранное'}</button></div></div></div>
 <h2>Отзывы</h2>${rv}<h2>Похожие</h2>${grid(sim)}`};
 
 const bsum=()=>{const p=gp(BP),c=calc(p,B.f,+B.h,B.c);return `<p>Услуга: ${c.base} ₽</p>${c.disc?`<p>Промокод: −${c.disc} ₽</p>`:''}<p>Сервисный сбор 10%: ${c.fee} ₽</p><h2 style="margin:6px 0">Итого: ${c.total} ₽</h2><p>Баланс: ${bal} ₽ · оплата внутри сервиса, контакты скрыты</p>`};
-R.book=id=>{const p=gp(id);if(!p)return nf();BP=p.id;B.h=1;B.c='';
+R.book=id=>{const p=gp(id);if(!p)return nf();
+if(paused(p))return `<h1>${p.n} на паузе</h1><p>Сегодня бронь недоступна. Загляни в её расписание или выбери другую напарницу.</p><div class="xr"><a class="xb" href="#/p/${p.id}">В профиль</a><a class="xb g" href="#/catalog">Каталог</a></div>`;
+BP=p.id;B.h=1;B.c='';
 return `<h1>Бронь: ${p.n}</h1><div class="xk">
 <select class="xi" data-b="f">${opt(Object.keys(FM).map(f=>[f,f]),B.f)}</select>
 <select class="xi" data-b="h">${[1,2,3,4,5].map(h=>`<option value="${h}">${h} ч</option>`).join('')}</select>
@@ -230,18 +240,20 @@ const wiz=()=>{const k=W.s;let h=`<p>Шаг ${k+1} из 4</p>`;
 if(k==0)h+=`<input class="xi" data-w="n" placeholder="Ник" value="${esc(W.n)}"><input class="xi" data-w="a" type="number" placeholder="Возраст (18+)" value="${W.a}">`;
 if(k==1)h+=G.map(g=>`<button class="xch ${W.g.includes(g)?'on':''}" data-a="wg" data-v="${g}">${g}</button>`).join('')+`<input class="xi" data-w="pr" type="number" placeholder="Цена за час, ₽" value="${W.pr}"><p style="margin-top:14px">Когда ты свободна. Нажми на день, чтобы сменить: свободна, по договорённости, отдых.</p><div class="shb">${W.d.map((v,i)=>`<button class="shd bt" data-a="wd" data-v="${i}"><i class="l${v}"></i><span>${DN[i]}</span></button>`).join('')}</div>`;
 if(k==2)h+=`<p>До 3 фото, сожмём до 480 px. Можно пропустить: будет иллюстрация.</p><input class="xi" id="wf" type="file" accept="image/*" multiple><div class="xg">${W.ph.map(u=>`<div class="xa"><img src="${u}"></div>`).join('')}</div>`;
-if(k==3)h+=`<textarea class="xi" data-w="bio" rows="4" placeholder="О себе">${esc(W.bio)}</textarea><label><input type="checkbox" data-w="ok" ${W.ok?'checked':''}> Мне 18+, согласна с правилами</label>`;
+if(k==3)h+=`<p>Твой настрой в игре:</p><div>${VB.map((x,i)=>`<button class="xch ${W.vb==i?'on':''}" data-a="wv" data-v="${i}">${x}</button>`).join('')}</div><textarea class="xi" data-w="bio" rows="4" placeholder="О себе">${esc(W.bio)}</textarea><label><input type="checkbox" data-w="ok" ${W.ok?'checked':''}> Мне 18+, согласна с правилами</label>`;
 return h+`<div class="xr">${k?'<button class="xb g" data-a="wp">Назад</button>':''}<button class="xb" data-a="wn">${k==3?'Опубликовать':'Далее'}</button></div>`};
 R.become=()=>`<h1>Стать напарницей</h1><p>Анкета за четыре шага.</p><div class="xk" id="wz">${wiz()}</div>`;
 
-R.safety=()=>`<h1>Безопасность</h1>${['Только игры: сервис не для знакомств','Только 18+','Контакты скрыты, общение внутри чата','Оплата проходит внутри сервиса','Расписание она задаёт сама, причины не спрашиваем','Любой заказ можно оспорить','Жалоба на пользователя в один клик'].map(t=>`<div class="xk">✔ ${t}</div>`).join('')}`;
+R.safety=()=>`<h1>Безопасность</h1>${['Только игры: сервис не для знакомств','Только 18+','Контакты скрыты, общение внутри чата','Оплата проходит внутри сервиса','Расписание и настрой она задаёт сама, причины не спрашиваем','Режим паузы: один нажим, и анкета скрыта','Любой заказ можно оспорить','Жалоба на пользователя в один клик'].map(t=>`<div class="xk">✔ ${t}</div>`).join('')}`;
 
 R.me=()=>{const rows=ord.map(o=>{const p=gp(o.pid)||{n:'?'};return `<a class="xrw" href="#/o/${o.id}"><div class="xa">${av(p,0)}</div><div><b>${p.n}</b><br><small>${o.f} · ${o.h} ч · ${o.sum} ₽</small></div><span style="margin-left:auto">${ST[o.st]}</span></a>`}).join('');
 const fl=fav.map(gp).filter(Boolean);
+const pz=my?`<div class="xk"><p>${paused(my)?'Сегодня анкета скрыта из каталога.':'Выбери дни, когда тебя не нужно беспокоить. Причины не нужны.'}</p><div>${DN.map((d,i)=>`<button class="xch ${(my.pz||[]).includes(i)?'on':''}" data-a="pz" data-v="${i}">${d}</button>`).join('')}</div><div class="xr"><button class="xb ${paused(my)?'g':''}" data-a="pz" data-v="${TD()}">${paused(my)?'Снять паузу на сегодня':'Пауза на сегодня'}</button></div></div>`:'<p>Блок появится после создания анкеты.</p>';
 return `<h1>Кабинет</h1><div class="xk"><p>Баланс (демо)</p><h2 id="xbl" style="margin:4px 0;color:var(--xp)">${bal.toLocaleString('ru')} ₽</h2><div class="xr">${[500,1000,3000].map(v=>`<button class="xb g" data-a="topup" data-v="${v}">+${v}</button>`).join('')}</div></div>
 <h2>Заказы</h2>${rows||'<p>Пока пусто.</p>'}<div class="xr"><button class="xb g" data-a="test">+ тестовый заказ</button></div>
 <h2>Избранное</h2>${fl.length?grid(fl):'<p>Пока пусто.</p>'}
-<h2>Моя анкета</h2>${my?grid([my]):'<a class="xb" href="#/become">Создать анкету</a>'}`};
+<h2>Моя анкета</h2>${my?grid([my]):'<a class="xb" href="#/become">Создать анкету</a>'}
+<h2>Режим паузы</h2>${pz}`};
 
 /* ROUTER */
 const TT={home:'Главная',catalog:'Каталог',match:'Подбор',top:'Топ',p:'Профиль',book:'Бронь',o:'Заказ',events:'События',become:'Стать напарницей',safety:'Безопасность',me:'Кабинет'};
@@ -249,7 +261,8 @@ const rt=()=>(location.hash.replace(/^#\/?/,'')||'home').split('/');
 let app,xm,xo,mn,xw,xwt,xbar,scene=0,busy=false;
 function nset(o){xm.classList.toggle('open',!!o);xo.classList.toggle('open',!!o);mn.textContent=o?'✕':'☰';if(o){const h=$('#hd');xm.style.top=(h?Math.round(h.getBoundingClientRect().bottom)-1:64)+'px'}}
 function render(){stopV();clearInterval(otm);nset(0);const[r,a]=rt();app.innerHTML=(R[r]||nf)(a);
-const p=r=='p'?gp(a):null;xbar.innerHTML=p?`<div class="xbk"><div><b>от ${p.pr} ₽/ч</b><br><small style="color:#93a398">${p.n}</small></div><a class="xb" href="#/book/${p.id}">Забронировать</a></div>`:'';
+const p=r=='p'?gp(a):null;
+xbar.innerHTML=p?(paused(p)?`<div class="xbk"><div><b>${p.n} на паузе</b><br><small style="color:#93a398">Бронь недоступна сегодня</small></div><a class="xb g" href="#/catalog">Каталог</a></div>`:`<div class="xbk"><div><b>от ${p.pr} ₽/ч</b><br><small style="color:#93a398">${p.n}</small></div><a class="xb" href="#/book/${p.id}">Забронировать</a></div>`):'';
 $$('#xm a').forEach(l=>l.classList.toggle('on',l.dataset.r==r));document.title='UEgirl · '+(TT[r]||'')}
 function trans(){if(busy){render();return}busy=true;const[r]=rt();xwt.textContent='Сцена '+String(++scene).padStart(2,'0')+' · '+(TT[r]||'');xw.className='in';
 setTimeout(()=>{render();scrollTo(0,0);xw.className='hold';setTimeout(()=>{xw.className='out';setTimeout(()=>{xw.className='';busy=false},TM[2])},TM[1])},TM[0])}
@@ -262,9 +275,11 @@ else if(a=='fav'){v=String(v);const i=fav.indexOf(v);i<0?fav.push(v):fav.splice(
 else if(a=='more'){F.n+=12;$('#cl').innerHTML=catL()}
 else if(a=='cg'){F.g=v;F.q='';F.n=12;location.hash='#/catalog'}
 else if(a=='tab'){T=v;$('#tt').innerHTML=tabs();$('#tp').innerHTML=topB()}
-else if(a=='mq'){const g=$('#mg').value;B.f=$('#mf').value;const l=allP().filter(p=>p.on&&(!g||p.g.includes(g))).sort((x,y)=>y.r-x.r).slice(0,3);if(!l.length){tt('Сейчас никого нет онлайн');return}location.hash='#/p/'+l[Math.floor(Math.random()*l.length)].id}
-else if(a=='mfind'){const ma=+$('#pa').value||99,mp=+$('#pp').value||99999,g=$('#pg').value,o=$('#po').checked,vv=$('#pv').checked;
-$('#mres').innerHTML=grid(allP().filter(p=>p.a<=ma&&p.pr<=mp&&(!g||p.g.includes(g))&&(!o||p.on)&&(!vv||p.v)))}
+else if(a=='pz'){if(!my){tt('Сначала создай анкету');return}my.pz=my.pz||[];const d=+v,i=my.pz.indexOf(d);i<0?my.pz.push(d):my.pz.splice(i,1);sv('sq_my',my);render();tt(paused(my)?'Пауза включена. Анкета скрыта сегодня':'Пауза снята')}
+else if(a=='wv'){W.vb=+v;$('#wz').innerHTML=wiz()}
+else if(a=='mq'){const g=$('#mg').value;B.f=$('#mf').value;const l=allP().filter(p=>p.on&&!paused(p)&&(!g||p.g.includes(g))).sort((x,y)=>y.r-x.r).slice(0,3);if(!l.length){tt('Сейчас никого нет онлайн');return}location.hash='#/p/'+l[Math.floor(Math.random()*l.length)].id}
+else if(a=='mfind'){const ma=+$('#pa').value||99,mp=+$('#pp').value||99999,g=$('#pg').value,b=$('#pb').value,o=$('#po').checked,vv=$('#pv').checked;
+$('#mres').innerHTML=grid(allP().filter(p=>!paused(p)&&p.a<=ma&&p.pr<=mp&&(!g||p.g.includes(g))&&(!b||String(p.vb||0)==b)&&(!o||p.on)&&(!vv||p.v)))}
 else if(a=='pay'){const p=gp(BP),c=calc(p,B.f,+B.h,B.c);if(c.total>bal){tt('Не хватает средств. Пополни в кабинете');return}
 bal-=c.total;setBal();const o={id:Date.now().toString(36),pid:p.id,f:B.f,h:+B.h,sum:c.total,st:0,m:[{w:'she',t:'Привет! Заявку получила, скоро подтвержу.'}]};ord.unshift(o);sv('sq_ord',ord);B.f='Дуо';location.hash='#/o/'+o.id}
 else if(a=='send'){const o=ord.find(x=>x.id===OID),i=$('#xin');if(!o||!i||!i.value.trim())return;
@@ -281,7 +296,7 @@ else if(a=='wn'){
 if(W.s==0&&(!W.n.trim()||+W.a<18)){tt('Нужен ник и возраст от 18');return}
 if(W.s==1&&(!W.g.length||!(+W.pr>0))){tt('Выбери игры и цену');return}
 if(W.s==3){if(!W.ok||!W.bio.trim()){tt('Напиши о себе и подтверди 18+');return}
-my={id:'my',n:esc(W.n.trim()),a:+W.a,g:W.g.slice(),pr:+W.pr,r:5,rv:0,on:true,v:false,h:7,bio:esc(W.bio.trim()),w:0,ph:W.ph.slice(),d:W.d.slice()};sv('sq_my',my);W={s:0,n:'',a:'',g:[],pr:'',bio:'',ph:[],ok:false,d:[2,2,2,2,2,1,1]};tt('Анкета опубликована');location.hash='#/p/my';return}
+my={id:'my',n:esc(W.n.trim()),a:+W.a,g:W.g.slice(),pr:+W.pr,r:5,rv:0,on:true,v:false,h:7,bio:esc(W.bio.trim()),w:0,ph:W.ph.slice(),d:W.d.slice(),vb:W.vb,pz:[]};sv('sq_my',my);W={s:0,n:'',a:'',g:[],pr:'',bio:'',ph:[],ok:false,vb:0,d:[2,2,2,2,2,1,1]};tt('Анкета опубликована');location.hash='#/p/my';return}
 W.s++;$('#wz').innerHTML=wiz()}
 }
 const rs=f=>new Promise(res=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,480/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.8))};i.src=r.result};r.readAsDataURL(f)});
