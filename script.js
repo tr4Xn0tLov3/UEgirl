@@ -1,4 +1,5 @@
 (function(){
+window.addEventListener('error',e=>{const d=document.createElement('div');d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#400;color:#fff;font:12px monospace;padding:8px;border-radius:8px';d.textContent='Ошибка: '+e.message+' (строка '+e.lineno+')';if(document.body)document.body.appendChild(d)});
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
 const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){tt('Память заполнена')}};
@@ -268,6 +269,22 @@ document.addEventListener('keydown',e=>{if(e.key=='Escape')nset(0);if(e.key=='En
 /* INIT */
 function init(){
 app=$('#app');
+const spl=$('#spl');
+const hideSpl=()=>{if(spl&&spl.style.display!='none'){spl.style.transition='opacity .6s';spl.style.opacity=0;setTimeout(()=>{spl.style.display='none'},650)}};
+setTimeout(hideSpl,5000);
+/* ЛОГОТИП */
+const nm=((window.CFG&&window.CFG.name)||'UEgirl').replace(/^UE/i,'');
+const lh='UE<span style="color:#ff4fa3">'+nm+'</span>';
+const fill=(el,css)=>{if(el&&!el.textContent.trim()){el.innerHTML=lh;el.style.cssText+=css}};
+const hd=$('#hd');
+if(!$('#logo')&&hd){const l=document.createElement('a');l.id='logo';l.href='#/';hd.insertBefore(l,hd.firstChild)}
+fill($('#logo'),';font:800 22px Sora,Manrope,sans-serif;color:#fff;text-decoration:none;letter-spacing:.02em');
+fill($('#splLogo'),';font:800 clamp(36px,10vw,64px) Sora,Manrope,sans-serif;color:#fff;letter-spacing:.04em;text-align:center');
+/* ЗАСТАВКА */
+const bar=$('#splBar'),pc=$('#splPc');let n=0;
+if(spl){const iv=setInterval(()=>{n=Math.min(100,n+Math.random()*14+6);if(bar)bar.style.width=n+'%';if(pc)pc.textContent=Math.floor(n)+'%';
+if(n>=100){clearInterval(iv);setTimeout(hideSpl,200)}},120)}
+/* ИНТЕРФЕЙС */
 const mk=(tag,id,html)=>{const x=document.createElement(tag);x.id=id;if(html)x.innerHTML=html;document.body.appendChild(x);return x};
 xw=mk('div','xw','<div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div id="xwt"></div>');xwt=$('#xwt');
 mk('div','xt');xbar=mk('div','xbar');const rec=mk('div','xrec','● REC 00:00:00');
@@ -276,7 +293,7 @@ const links=[['home','#/','Главная'],['match','#/match','Подбор'],[
 xm=mk('nav','xm',links.map(l=>`<a href="${l[1]}" data-r="${l[0]}">${l[2]}</a>`).join(''));
 xm.addEventListener('click',e=>{if(e.target.closest('a'))nset(0)});
 mn=document.createElement('button');mn.id='mn';mn.setAttribute('aria-label','Меню');mn.textContent='☰';mn.onclick=()=>nset(!xm.classList.contains('open'));
-const hr=$('.hd-r')||$('#hd');if(hr)hr.appendChild(mn);
+const hr=$('.hd-r')||hd;if(hr)hr.appendChild(mn);
 const lg=$('#logo');if(lg){lg.style.cursor='pointer';lg.addEventListener('click',()=>{location.hash='#/'})}
 const bl=$('#bal');if(bl){bl.style.cursor='pointer';bl.addEventListener('click',()=>{location.hash='#/me'})}
 setBal();render();
@@ -284,9 +301,6 @@ addEventListener('hashchange',trans);
 addEventListener('scroll',()=>{const p=$('#prog');if(p){const h=document.documentElement;p.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight||1)*100)+'%'}},{passive:true});
 const t0=Date.now();setInterval(()=>{const q=Math.floor((Date.now()-t0)/1000);rec.textContent='● REC '+[q/3600,q/60%60,q%60].map(x=>String(Math.floor(x)).padStart(2,'0')).join(':')},1000);
 setInterval(()=>{const l=P.filter(p=>p.on),p=l[Math.floor(Math.random()*l.length)];tt(`${p.n} онлайн · ищет дуо в ${p.g[0]}`)},24000);
-const spl=$('#spl'),bar=$('#splBar'),pc=$('#splPc');let n=0;
-if(spl){const iv=setInterval(()=>{n=Math.min(100,n+Math.random()*14+6);if(bar)bar.style.width=n+'%';if(pc)pc.textContent=Math.floor(n)+'%';
-if(n>=100){clearInterval(iv);setTimeout(()=>{spl.style.transition='opacity .6s';spl.style.opacity=0;setTimeout(()=>{spl.style.display='none'},650)},200)}},120)}
 }
 if(document.readyState=='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
