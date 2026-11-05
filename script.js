@@ -389,3 +389,10 @@ setTimeout(live,5500);setInterval(live,8000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+function av(p,k){
+k=k||0;
+const h=(p.h+k*40)%360;
+if(p.ph&&p.ph[k])return '<div class="av" style="--h:'+h+'"><img src="'+p.ph[k]+'" alt=""></div>';
+const u='https://api.dicebear.com/9.x/lorelei/svg?seed='+encodeURIComponent(p.n+(k?'-'+k:''));
+return '<div class="av" style="--h:'+h+'"><img src="'+u+'" alt="" loading="lazy" onerror="this.style.display=\'none\'"></div>';
+}
